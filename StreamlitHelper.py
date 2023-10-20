@@ -87,3 +87,25 @@ class StreamLitHelper:
                 new_row_df = pd.DataFrame([new_row])
                 multiflo_avg_weight_df = pd.concat([multiflo_avg_weight_df, new_row_df], ignore_index=True)
         return multiflo_avg_weight_df
+    
+
+    # change for multiflo data
+    def runs_by_hour_hist(self, data, method_name):
+        if method_name is None: 
+            data['hour'] = data['datetime'].dt.hour
+            hours = [str(i) for i in range(1, 25)]
+            histogram = data['hour'].value_counts().reindex(range(24), fill_value=0)
+            histogram.index = pd.Categorical(histogram.index, categories=range(24), ordered=True)
+            histogram = histogram.sort_index()
+            hour_names_dict = dict(enumerate(hours))
+            histogram.index = histogram.index.map(hour_names_dict)
+            st.bar_chart(histogram)
+        else:
+            data['hour'] = data['datetime'].dt.hour
+            hours = [str(i) for i in range(1, 25)]
+            histogram = data['hour'].value_counts().reindex(range(24), fill_value=0)
+            histogram.index = pd.Categorical(histogram.index, categories=range(24), ordered=True)
+            histogram = histogram.sort_index()
+            hour_names_dict = dict(enumerate(hours))
+            histogram.index = histogram.index.map(hour_names_dict)
+            st.bar_chart(histogram)
