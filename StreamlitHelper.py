@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from matplotlib import pyplot as plt
 import math
 import sqlite3
 
@@ -89,23 +90,18 @@ class StreamLitHelper:
         return multiflo_avg_weight_df
     
 
-    # change for multiflo data
-    def runs_by_hour_hist(self, data, method_name):
-        if method_name is None: 
-            data['hour'] = data['datetime'].dt.hour
-            hours = [str(i) for i in range(1, 25)]
-            histogram = data['hour'].value_counts().reindex(range(24), fill_value=0)
-            histogram.index = pd.Categorical(histogram.index, categories=range(24), ordered=True)
-            histogram = histogram.sort_index()
-            hour_names_dict = dict(enumerate(hours))
-            histogram.index = histogram.index.map(hour_names_dict)
-            st.bar_chart(histogram)
-        else:
-            data['hour'] = data['datetime'].dt.hour
-            hours = [str(i) for i in range(1, 25)]
-            histogram = data['hour'].value_counts().reindex(range(24), fill_value=0)
-            histogram.index = pd.Categorical(histogram.index, categories=range(24), ordered=True)
-            histogram = histogram.sort_index()
-            hour_names_dict = dict(enumerate(hours))
-            histogram.index = histogram.index.map(hour_names_dict)
-            st.bar_chart(histogram)
+    def avg_disp_by_run(self, data, column_name):
+        if column_name not in data.columns:
+            return "Variable column not found in the DataFrame"
+        data['run_number'] = pd.to_numeric(data['run_number'], errors='coerce')
+        data = data.sort_values(by='run_number')
+        selected_data = data[['run_number', column_name]]
+        st.line_chart(selected_data.set_index('run_number'), use_container_width=True, width=500, height=250)
+
+    
+    def get_cell_value(self, data, row_index, column_name):
+        try:
+            value = data.at[row_index, column_name]
+            return value
+        except KeyError:
+            return None
